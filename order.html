@@ -1,0 +1,48 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order Menu</title>
+</head>
+<body>
+    <h1>Order Your Pizza</h1>
+    <form action="submit_order.html" method="post">
+        <!-- Customer Info -->
+        <label for="name">Your Name:</label><br>
+        <input type="text" id="name" name="customerName" required><br><br>
+
+        <label for="address">Delivery Address:</label><br>
+        <input type="text" id="address" name="address" required><br><br>
+
+        <!-- Pizza Size -->
+        <label for="size">Choose Size:</label><br>
+        <select id="size" name="size" required>
+            <option value="Small">Small ($6)</option>
+            <option value="Medium">Medium ($8)</option>
+            <option value="Large">Large (10$)</option>
+        </select><br><br>
+
+        <!-- Toppings -->
+        <fieldset>
+            <legend>Select Toppings:</legend>
+            <input type="checkbox" id="pepperoni" name="topping" value="Pepperoni">
+            <label for="pepperoni">Pepperoni ($2)</label><br>
+
+            <input type="checkbox" id="mushrooms" name="topping" value="Mushrooms">
+            <label for="mushrooms">Mushrooms ($1)</label><br>
+
+            <input type="checkbox" id="onions" name="topping" value="Onions">
+            <label for="onions">Onions ($1)</label><br>
+
+            <input type="checkbox" id="olives" name="topping" value="Olives">
+            <label for="olives">Olives ($1)</label><br>
+
+            <input type="checkbox" id="cheese" name="topping" value="Extra Cheese">
+            <label for="cheese">Extra Cheese ($1)</label><br>
+        </fieldset><br>
+
+        <!-- Submit -->
+        <button type="submit">Place Order</button>
+    </form>
+</body>
+</html>
