@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pizza Order</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 24px auto; }
+    fieldset { margin-bottom: 12px; }
+    label { display:block; margin:6px 0; }
+    .inline { display:inline-block; margin-right:12px; }
+    button { padding:8px 12px; }
+  </style>
+</head>
+<body>
+  <h1>Pizza Online Ordering</h1>
+
+  <form id="orderForm">
+    <fieldset>
+      <legend>Customer</legend>
+      <label> Name: <input name="customer_name" required /></label>
+      <label> Email: <input name="email" required /></label>
+      <label> Address: <input name="address" required style="width:100%" /></label>
+    </fieldset>
+
+    <fieldset>
+      <legend>Pizzas</legend>
+      <div id="pizzas"></div>
+      <button type="button" id="addPizza">Add Pizza</button>
+    </fieldset>
+
+    <button type="submit">Submit Order</button>
+  </form>
+
+  <template id="pizzaTpl">
+    <div class="pizzaCard" style="border:1px solid #ddd; padding:8px; margin:8px 0;">
+      <label>Size:
+        <select name="size">
+          <option value="Small">Small ($8.00)</option>
+          <option value="Medium">Medium ($10.00)</option>
+          <option value="Large">Large ($12.00)</option>
+        </select>
+      </label>
+      <label>Crust:
+        <select name="crust">
+          <option>Thin</option>
+          <option>Hand-tossed</option>
+          <option>Stuffed</option>
+        </select>
+      </label>
+      <div>Toppings:</div>
+      <label class="inline"><input type="checkbox" name="topping" value="Pepperoni" /> Pepperoni</label>
+      <label class="inline"><input type="checkbox" name="topping" value="Mushrooms" /> Mushrooms</label>
+      <label class="inline"><input type="checkbox" name="topping" value="Onions" /> Onions</label>
+      <label class="inline"><input type="checkbox" name="topping" value="Sausage" /> Sausage</label>
+      <label class="inline"><input type="checkbox" name="topping" value="Bacon" /> Bacon</label>
+      <label class="inline"><input type="checkbox" name="topping" value="Extra cheese" /> Extra cheese</label>
+      <label class="inline"><input type="checkbox" name="topping" value="Black olives" /> Black olives</label>
+      <label class="inline"><input type="checkbox" name="topping" value="Green peppers" /> Green peppers</label>
+      <label class="inline"><input type="checkbox" name="topping" value="Pineapple" /> Pineapple</label>
+      <label class="inline"><input type="checkbox" name="topping" value="Spinach" /> Spinach</label>
+      <div><button type="button" class="removePizza">Remove</button></div>
+    </div>
+  </template>
+
+  <div id="result"></div>
+
+  <script>
+    const addPizzaBtn = document.getElementById('addPizza');
+    const pizzasDiv = document.getElementById('pizzas');
+    const pizzaTpl = document.getElementById('pizzaTpl');
+    function addPizza() {
+      const node = pizzaTpl.content.cloneNode(true);
+      const card = node.querySelector('.pizzaCard');
+      card.querySelector('.removePizza').addEventListener('click', ()=>card.remove());
+      pizzasDiv.appendChild(node);
+    }
+    addPizzaBtn.addEventListener('click', addPizza);
+    // start with one pizza
+    addPizza();
+
+    document.getElementById('orderForm').addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const form = ev.target;
+      const data = new FormData(form);
+      const order = {
+        customer_name: data.get('customer_name'),
+        email: data.get('email'),
+        address: data.get('address'),
+        pizzas: []
+      };
+      document.querySelectorAll('.pizzaCard').forEach(card => {
+        const size = card.querySelector('select[name=size]').value;
+        const crust = card.querySelector('select[name=crust]').value;
+        const toppings = Array.from(card.querySelectorAll('input[name=topping]:checked')).map(i=>i.value);
+        order.pizzas.push({size, crust, toppings});
+      });
+
+      const resDiv = document.getElementById('result');
+      resDiv.textContent = 'Sending order...';
+
+      try {
+        const resp = await fetch('/order', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify(order)
+        });
+        const text = await resp.text();
+        resDiv.innerHTML = text;
+      } catch (err) {
+        resDiv.textContent = 'Failed to send order: '+err;
+      }
+    });
+  </script>
+</body>
+</html>
