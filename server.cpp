@@ -270,7 +270,7 @@ int main()
         return 1;
     }
 
-    cout << "Server listening on http://localhost:8080/ (serve PageTest.html)\n"
+    cout << "Server listening on http://localhost:8080/ (serve MainPizzapage.html)\n"
          << endl;
 
     while (true)
