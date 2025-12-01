@@ -169,3 +169,6 @@ int main() {
     close(server_fd);
     return 0;
 }
+
+//compile: g++ -std=c++17 server.cpp Order.cpp OrderHistory.cpp AccountRegistration.cpp Login.cpp -o server -pthread
+//run: ./server
