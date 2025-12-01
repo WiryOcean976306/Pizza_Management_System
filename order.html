@@ -1,48 +1,230 @@
 ﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Order Menu</title>
+  <meta charset="UTF-8">
+  <title>Order Menu</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #fdf2e9;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      color: #d35400;
+      text-align: center;
+    }
+    form {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    fieldset {
+      margin-top: 15px;
+      border: 1px solid #ccc;
+      padding: 10px;
+      position: relative;
+    }
+    legend { font-weight: bold; }
+    label { font-weight: bold; display: block; margin-top: 8px; }
+    select, input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    .checkbox-group {
+      display: flex;
+      align-items: center;
+      margin-top: 5px;
+    }
+    .checkbox-group input { margin-right: 8px; }
+    .remove-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background-color: #c0392b;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      border-radius: 50%;
+      font-size: 14px;
+      line-height: 1;
+    }
+    .remove-btn:hover { background-color: #a93226; }
+    .subtotal {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    button {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover { background-color: #219150; }
+    #total {
+      font-size: 18px;
+      font-weight: bold;
+      margin-top: 15px;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-    <h1>Order Your Pizza</h1>
-    <form action="submit_order.html" method="post">
-        <!-- Customer Info -->
-        <label for="name">Your Name:</label><br>
-        <input type="text" id="name" name="customerName" required><br><br>
+  <h1>Order Your Pizza</h1>
+  <form id="pizzaForm" action="submit_order.html" method="post">
+    <!-- Customer Info -->
+    <label for="name">Your Name:</label>
+    <input type="text" id="name" name="customerName" required>
 
-        <label for="address">Delivery Address:</label><br>
-        <input type="text" id="address" name="address" required><br><br>
+    <!-- Delivery Address -->
+    <fieldset>
+      <legend>Delivery Address</legend>
+      <label for="street">Street Address:</label>
+      <input type="text" id="street" name="street" required>
 
-        <!-- Pizza Size -->
-        <label for="size">Choose Size:</label><br>
-        <select id="size" name="size" required>
-            <option value="Small">Small ($6)</option>
-            <option value="Medium">Medium ($8)</option>
-            <option value="Large">Large (10$)</option>
-        </select><br><br>
+      <label for="city">City:</label>
+      <input type="text" id="city" name="city" required>
 
-        <!-- Toppings -->
-        <fieldset>
-            <legend>Select Toppings:</legend>
-            <input type="checkbox" id="pepperoni" name="topping" value="Pepperoni">
-            <label for="pepperoni">Pepperoni ($2)</label><br>
+      <label for="state">State:</label>
+      <input type="text" id="state" name="state" required>
 
-            <input type="checkbox" id="mushrooms" name="topping" value="Mushrooms">
-            <label for="mushrooms">Mushrooms ($1)</label><br>
+      <label for="zipcode">Zip Code:</label>
+      <input type="number" id="zipcode" name="zipcode" required>
+    </fieldset>
 
-            <input type="checkbox" id="onions" name="topping" value="Onions">
-            <label for="onions">Onions ($1)</label><br>
+    <!-- Pizza Container -->
+    <div id="pizzaContainer">
+      <fieldset class="pizza">
+        <legend>Pizza 1</legend>
+        <button type="button" class="remove-btn" style="display:none;">✖</button>
+        <label>Choose Size:</label>
+        <select name="size[]" class="size" required>
+          <option value="6">Small ($6)</option>
+          <option value="8">Medium ($8)</option>
+          <option value="10">Large ($10)</option>
+        </select>
 
-            <input type="checkbox" id="olives" name="topping" value="Olives">
-            <label for="olives">Olives ($1)</label><br>
+        <p>Toppings:</p>
+        <div class="checkbox-group">
+          <input type="checkbox" value="2" class="topping">Pepperoni ($2)
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" value="1" class="topping">Mushrooms ($1)
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" value="1" class="topping">Onions ($1)
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" value="1" class="topping">Olives ($1)
+        </div>
+        <div class="checkbox-group">
+          <input type="checkbox" value="1" class="topping">Extra Cheese ($1)
+        </div>
 
-            <input type="checkbox" id="cheese" name="topping" value="Extra Cheese">
-            <label for="cheese">Extra Cheese ($1)</label><br>
-        </fieldset><br>
+        <div class="subtotal">Subtotal: $0</div>
+      </fieldset>
+    </div>
 
-        <!-- Submit -->
-        <button type="submit">Place Order</button>
-    </form>
+    <!-- Add Pizza Button -->
+    <button type="button" id="addPizzaBtn">Add Another Pizza</button>
+
+    <!-- Payment Info -->
+    <fieldset>
+      <legend>Payment Details</legend>
+      <label for="cardName">Name on Card:</label>
+      <input type="text" id="cardName" name="cardName" required>
+
+      <label for="cardNumber">Card Number:</label>
+      <input type="number" id="cardNumber" name="cardNumber" required>
+
+      <label for="expiry">Expiry Date (MM/YY):</label>
+      <input type="text" id="expiry" name="expiry" placeholder="MM/YY" required>
+
+      <label for="cvv">CVV:</label>
+      <input type="number" id="cvv" name="cvv" required>
+    </fieldset>
+
+    <div id="total">Total: $0</div>
+    <button type="submit">Checkout</button>
+  </form>
+
+  <script>
+    const pizzaContainer = document.getElementById("pizzaContainer");
+    const addPizzaBtn = document.getElementById("addPizzaBtn");
+    const totalDiv = document.getElementById("total");
+
+    function calculatePizzaSubtotal(pizza) {
+      let subtotal = 0;
+      const size = pizza.querySelector(".size");
+      subtotal += parseFloat(size.value);
+      const toppings = pizza.querySelectorAll(".topping");
+      toppings.forEach(t => {
+        if (t.checked) subtotal += parseFloat(t.value);
+      });
+      pizza.querySelector(".subtotal").textContent = "Subtotal: $" + subtotal.toFixed(2);
+      return subtotal;
+    }
+
+    function calculateTotal() {
+      let total = 0;
+      const pizzas = document.querySelectorAll(".pizza");
+      pizzas.forEach(pizza => {
+        total += calculatePizzaSubtotal(pizza);
+      });
+      totalDiv.textContent = "Total: $" + total.toFixed(2);
+    }
+
+    function renumberPizzas() {
+      const pizzas = document.querySelectorAll(".pizza");
+      pizzas.forEach((pizza, index) => {
+        pizza.querySelector("legend").textContent = "Pizza " + (index + 1);
+      });
+    }
+
+    function attachListeners(pizza) {
+      pizza.querySelector(".size").addEventListener("change", calculateTotal);
+      pizza.querySelectorAll(".topping").forEach(cb => {
+        cb.addEventListener("change", calculateTotal);
+      });
+      const removeBtn = pizza.querySelector(".remove-btn");
+      removeBtn.addEventListener("click", () => {
+        pizza.remove();
+        renumberPizzas();
+        calculateTotal();
+      });
+    }
+
+    attachListeners(document.querySelector(".pizza"));
+
+    addPizzaBtn.addEventListener("click", () => {
+      const firstPizza = document.querySelector(".pizza");
+      const newPizza = firstPizza.cloneNode(true);
+
+      newPizza.querySelector(".size").selectedIndex = 0;
+      newPizza.querySelectorAll(".topping").forEach(cb => cb.checked = false);
+      newPizza.querySelector(".subtotal").textContent = "Subtotal: $0";
+
+      newPizza.querySelector(".remove-btn").style.display = "inline-block";
+
+      pizzaContainer.appendChild(newPizza);
+      attachListeners(newPizza);
+      renumberPizzas();
+      calculateTotal();
+    });
+
+    calculateTotal();
+  </script>
 </body>
 </html>

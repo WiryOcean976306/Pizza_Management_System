@@ -1,39 +1,114 @@
 ﻿<!DOCTYPE html>
-<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <title>Pizza House</title>
-    <style>
-        /* Style for the sign-up button */
-        .signup-btn {
-            position: absolute;   /* allows placement anywhere */
-            top: 10px;            /* distance from the top */
-            right: 100px;          /* distance from the right */
-            padding: 10px 20px;
-            background-color: #d35400;
-            color: white;
-            border: none;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        .signup-btn:hover {
-            background-color: #a84300;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pizza House</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      background-image: url('https://copilot.microsoft.com/th/id/BCO.e6f9f535-5f9c-4335-9847-9baed46d2347.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: white;
+    }
+
+    header {
+      background: rgba(0,0,0,0.5);
+      padding: 15px;
+      display: flex;
+      flex-direction: column; /* stack nav above title row */
+      align-items: center;
+    }
+
+    nav ul {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center; /* center the links */
+      gap: 20px;
+    }
+
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .header-bottom {
+      width: 100%;
+      display: flex;
+      justify-content: space-between; /* title left, buttons right */
+      align-items: center;
+      margin-top: 10px;
+    }
+
+    h1 {
+      margin: 0;
+    }
+
+    .signup-btn {
+      padding: 10px 20px;
+      background-color: #d35400;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    .signup-btn:hover {
+      background-color: #a84300;
+    }
+
+    main {
+      flex: 1; /* pushes footer down */
+      padding: 20px;
+      text-align: center;
+    }
+
+    footer {
+      text-align: center;
+      padding: 10px;
+      background: rgba(0,0,0,0.5);
+    }
+  </style>
 </head>
 <body>
-    <!-- Sign Up button in the top right -->
-    <button class="signup-btn">Sign Up</button>
+  <header>
+    <!-- Navigation row -->
+    <nav>
+      <ul>
+        <li><a href="order.html">Order</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </nav>
 
-    <h1>Pizza House</h1>
+    <!-- Title row -->
+    <div class="header-bottom">
+      <h1>Pizza House</h1>
+      <div>
+        <button class="signup-btn">Sign Up</button>
+        <!-- Shopping cart removed -->
+      </div>
+    </div>
+  </header>
+
+  <main>
     <p>Welcome to Pizza House, your go-to place for delicious pizzas!</p>
-    <ul>
-        <li><a href="menu.html">View Menu</a></li>
-        <li><a href="order.html">Order Online</a></li>
-        <li><a href="contact.html">Contact Us</a></li>
-    </ul>
-    <footer>
-        <p>&copy; 2023 Pizza House. All rights reserved.</p>
-    </footer>
+  </main>
+
+  <footer>
+    <p>&copy; 2023 Pizza House. All rights reserved.</p>
+  </footer>
 </body>
 </html>
