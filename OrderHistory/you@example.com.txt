@@ -1,0 +1,11 @@
+------------------------------
+Order ID: ORD20251201172508213
+Customer Name: John Doe
+Address: 123 road, Gotham, NJ 12345
+Date: 2025-12-01
+Time: 17:25:08
+Total: $11.50
+Pizzas:
+  Pizza 1: Size $10, Toppings: Pepperoni ($2)
+------------------------------
+
