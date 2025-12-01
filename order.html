@@ -83,7 +83,7 @@
 </head>
 <body>
   <h1>Order Your Pizza</h1>
-  <form id="pizzaForm" action="submit_order.html" method="post">
+  <form id="pizzaForm" method="post">
     <!-- Customer Info -->
     <label for="name">Your Name:</label>
     <input type="text" id="name" name="customerName" required>
@@ -157,13 +157,16 @@
     </fieldset>
 
     <div id="total">Total: $0</div>
-    <button type="submit">Checkout</button>
+    <button type="submit" id="checkoutBtn">Checkout</button>
+    <div id="result"></div>
   </form>
 
   <script>
     const pizzaContainer = document.getElementById("pizzaContainer");
     const addPizzaBtn = document.getElementById("addPizzaBtn");
     const totalDiv = document.getElementById("total");
+    const resultDiv = document.getElementById("result");
+    const pizzaForm = document.getElementById("pizzaForm");
 
     function calculatePizzaSubtotal(pizza) {
       let subtotal = 0;
@@ -225,6 +228,56 @@
     });
 
     calculateTotal();
+
+    // Handle form submission - send JSON to server
+    pizzaForm.addEventListener("submit", (ev) => {
+      ev.preventDefault();
+      
+      const customerName = document.getElementById("name").value;
+      const street = document.getElementById("street").value;
+      const city = document.getElementById("city").value;
+      const state = document.getElementById("state").value;
+      const zipcode = document.getElementById("zipcode").value;
+      const cardName = document.getElementById("cardName").value;
+      const cardNumber = document.getElementById("cardNumber").value;
+      const expiry = document.getElementById("expiry").value;
+      const cvv = document.getElementById("cvv").value;
+
+      const pizzas = [];
+      document.querySelectorAll(".pizza").forEach(pizza => {
+        const size = pizza.querySelector(".size").value;
+        const toppings = Array.from(pizza.querySelectorAll(".topping:checked")).map(t => t.parentNode.textContent.trim());
+        pizzas.push({ size, toppings });
+      });
+
+      const order = {
+        customerName,
+        address: { street, city, state, zipcode },
+        pizzas,
+        payment: { cardName, cardNumber, expiry, cvv }
+      };
+
+      resultDiv.textContent = "Sending order...";
+      resultDiv.style.display = "block";
+      resultDiv.style.marginTop = "15px";
+      resultDiv.style.padding = "10px";
+      resultDiv.style.backgroundColor = "#ffe082";
+      resultDiv.style.borderRadius = "4px";
+
+      fetch("/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(order)
+      }).then(resp => resp.text()).then(text => {
+        resultDiv.textContent = "✓ Order received! " + text;
+        resultDiv.style.backgroundColor = "#4caf50";
+        resultDiv.style.color = "white";
+      }).catch(err => {
+        resultDiv.textContent = "✗ Failed to send order: " + err;
+        resultDiv.style.backgroundColor = "#ff5252";
+        resultDiv.style.color = "white";
+      });
+    });
   </script>
 </body>
 </html>

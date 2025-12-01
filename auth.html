@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Pizza House | Account</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<style>
+		:root {
+			--primary: #d35400;
+			--primary-dark: #a84300;
+			--bg: #0b0b10;
+			--card-bg: #181820;
+			--text: #f5f5f5;
+			--muted: #b3b3b3;
+			--accent: #ffe082;
+			--error: #ff5252;
+		}
+
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		body {
+			font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+			background: radial-gradient(circle at top left, #2c3e50 0, #000 50%, #111 100%);
+			color: var(--text);
+			min-height: 100vh;
+		}
+
+		a {
+			color: var(--accent);
+			text-decoration: none;
+		}
+
+		a:hover {
+			text-decoration: underline;
+		}
+
+		.shell {
+			position: relative;
+			height: 100vh;
+			overflow: hidden;
+		}
+
+		.shell-inner {
+			position: relative;
+			width: 200%;
+			/* two frames next to each other */
+			height: 100%;
+			display: flex;
+			transition: transform 0.6s ease-in-out;
+		}
+
+		.shell[data-mode="signup"] .shell-inner {
+			transform: translateX(0%);
+		}
+
+		.shell[data-mode="login"] .shell-inner {
+			transform: translateX(-50%);
+		}
+
+		.frame {
+			width: 50%;
+			height: 100%;
+			display: flex;
+			align-items: stretch;
+		}
+
+		.frame-inner {
+			display: flex;
+			width: 100%;
+			height: 100%;
+		}
+
+		.image-col {
+			flex: 0 0 60%;
+			position: relative;
+			overflow: hidden;
+			background-image: url(./pizza_bg.jpg);
+		}
+
+		.image-bg {
+			position: absolute;
+			inset: 0;
+			background-image: url('pizza_bg.jpg');
+			background-size: cover;
+			background-position: center;
+			background-repeat: no-repeat;
+			z-index: 1;
+		}
+
+
+		.image-visual {
+			position: absolute;
+			inset: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 40px;
+		}
+
+		.pizza-hero {
+			width: 260px;
+			height: 260px;
+			border-radius: 50%;
+			border: 8px solid rgba(255, 255, 255, 0.4);
+			box-shadow: 0 18px 50px rgba(0, 0, 0, .9);
+			background:
+				radial-gradient(circle at 30% 30%, #ffe082 0, #ffb74d 40%, #f57c00 75%),
+				radial-gradient(circle at 70% 40%, #ffcc80 0, #ffb74d 45%, transparent 60%),
+				radial-gradient(circle at 40% 70%, #ffcc80 0, #ffb74d 45%, transparent 60%);
+			position: relative;
+		}
+
+		.pizza-hero::before,
+		.pizza-hero::after {
+			content: "";
+			position: absolute;
+			border-radius: 50%;
+			background: rgba(111, 53, 24, 0.85);
+		}
+
+		.pizza-hero::before {
+			width: 18px;
+			height: 18px;
+			top: 18%;
+			left: 38%;
+		}
+
+		.pizza-hero::after {
+			width: 20px;
+			height: 20px;
+			top: 62%;
+			right: 20%;
+		}
+
+		.image-caption {
+			position: absolute;
+			bottom: 24px;
+			left: 40px;
+			font-size: 13px;
+			color: var(--muted);
+		}
+
+		.image-caption span {
+			display: block;
+			font-size: 11px;
+			letter-spacing: .1em;
+			text-transform: uppercase;
+			color: var(--accent);
+		}
+
+		.form-col {
+			flex: 1;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			padding: 24px;
+			background: #fffcfc;
+		}
+
+		.auth-card {
+			width: 100%;
+			max-width: 430px;
+			background: rgba(24, 24, 32, 0.96);
+			border-radius: 18px;
+			padding: 22px 22px 18px;
+			box-shadow: 0 16px 36px rgba(0, 0, 0, .8);
+			border: 1px solid rgba(255, 255, 255, 0.06);
+		}
+
+		.brand {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			margin-bottom: 16px;
+		}
+
+		.brand-logo {
+			width: 36px;
+			height: 36px;
+			border-radius: 50%;
+			background: conic-gradient(from 180deg, #ff6f00, #ffcc80, #ff6f00);
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-weight: 700;
+			color: #2c1810;
+		}
+
+		.brand-text {
+			display: flex;
+			flex-direction: column;
+			line-height: 1.1;
+		}
+
+		.brand-text span:first-child {
+			font-size: 11px;
+			text-transform: uppercase;
+			letter-spacing: .08em;
+			color: var(--accent);
+		}
+
+		.brand-text span:last-child {
+			font-size: 18px;
+			font-weight: 700;
+		}
+
+		.auth-header {
+			margin-bottom: 16px;
+		}
+
+		.auth-header h1 {
+			font-size: 22px;
+			margin-bottom: 4px;
+		}
+
+		.auth-header p {
+			font-size: 13px;
+			color: var(--muted);
+		}
+
+		form {
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+			margin-bottom: 14px;
+		}
+
+		.field {
+			display: flex;
+			flex-direction: column;
+			gap: 4px;
+		}
+
+		.field-row {
+			display: flex;
+			gap: 8px;
+		}
+
+		.field-row .field {
+			flex: 1;
+		}
+
+		label {
+			font-size: 13px;
+			color: var(--muted);
+		}
+
+		input[type="text"],
+		input[type="email"],
+		input[type="password"],
+		input[type="tel"] {
+			padding: 9px 11px;
+			border-radius: 10px;
+			border: 1px solid rgba(255, 255, 255, 0.16);
+			background: #101018;
+			color: var(--text);
+			font-size: 14px;
+		}
+
+		input::placeholder {
+			color: #777;
+		}
+
+		input:focus {
+			outline: none;
+			border-color: var(--primary);
+			box-shadow: 0 0 0 1px rgba(211, 84, 0, 0.4);
+		}
+
+		.checkbox-row {
+			display: flex;
+			align-items: flex-start;
+			gap: 8px;
+			font-size: 12px;
+			color: var(--muted);
+		}
+
+		input[type="checkbox"] {
+			accent-color: var(--primary);
+			margin-top: 2px;
+		}
+
+		.field-inline {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			font-size: 12px;
+		}
+
+		.error-msg {
+			display: none;
+			font-size: 12px;
+			color: var(--error);
+		}
+
+		.btn-primary {
+			padding: 9px 14px;
+			border-radius: 999px;
+			border: none;
+			background: var(--primary);
+			color: #fff;
+			font-size: 14px;
+			font-weight: 600;
+			cursor: pointer;
+			margin-top: 4px;
+			box-shadow: 0 10px 26px rgba(0, 0, 0, .7);
+			transition: background 0.15s ease-out, transform 0.1s ease-out, box-shadow 0.1s ease-out;
+			width: 100%;
+		}
+
+		.btn-primary:hover {
+			background: var(--primary-dark);
+			transform: translateY(-1px);
+		}
+
+		.btn-primary:active {
+			transform: translateY(0);
+			box-shadow: 0 6px 18px rgba(0, 0, 0, .7);
+		}
+
+		.auth-footer {
+			font-size: 12px;
+			color: var(--muted);
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 6px;
+			flex-wrap: wrap;
+		}
+
+		.toggle-link {
+			font-weight: 500;
+			cursor: pointer;
+		}
+
+		.hint {
+			font-size: 11px;
+			color: var(--muted);
+			margin-top: 6px;
+		}
+
+		.action {
+			color: var(--accent);
+			text-decoration: none;
+		}
+
+		/* Responsive: stack on mobile */
+		@media (max-width: 800px) {
+			.shell-inner {
+				width: 100%;
+				transform: translateX(0) !important;
+			}
+
+			.frame {
+				width: 100%;
+			}
+
+			.image-col {
+				display: none;
+			}
+
+			.form-col {
+				flex: 1;
+				padding: 16px;
+			}
+
+			body {
+				height: auto;
+				min-height: 100vh;
+			}
+		}
+	</style>
+</head>
+
+<body>
+	<!-- Start in signup mode; we'll also support #login via JS -->
+	<div class="shell" id="shell" data-mode="signup">
+		<div class="shell-inner">
+			<!-- Frame 1: Image left (60%), Signup form right (40%) -->
+			<section class="frame" aria-label="Sign up frame">
+				<div class="frame-inner">
+					<div class="image-col">
+						<div class="image-bg"></div>
+						<div class="image-visual">
+							<!-- <div class="pizza-hero"></div> -->
+						</div>
+						<div class="image-caption">
+							<span>Pizza House</span>
+							Fresh, fast, and made the way you like it.
+						</div>
+					</div>
+					<div class="form-col">
+						<div class="auth-card">
+							<div class="brand">
+								<div class="brand-logo">PH</div>
+								<div class="brand-text">
+									<span>Pizza House</span>
+									<span>Create your account</span>
+								</div>
+							</div>
+
+							<div class="auth-header">
+								<h1>Sign up for faster pizza nights 🍕</h1>
+								<p>Save your details, reorder favorites, and track delivery in
+									one place.</p>
+							</div>
+
+							<form method="post" id="signupForm">
+								<div class="field-row">
+									<div class="field">
+										<label for="su-firstName">First name</label>
+										<input id="su-firstName" name="firstName" type="text"
+											placeholder="John" required />
+									</div>
+									<div class="field">
+										<label for="su-lastName">Last name</label>
+										<input id="su-lastName" name="lastName" type="text"
+											placeholder="Doe" required />
+									</div>
+								</div>
+
+								<div class="field">
+									<label for="su-email">Email address</label>
+									<input id="su-email" name="email" type="email"
+										placeholder="you@example.com" required />
+								</div>
+
+								<div class="field">
+									<label for="su-phone">Phone (for delivery updates)</label>
+									<input id="su-phone" name="phone" type="tel"
+										placeholder="(555) 123-4567" />
+								</div>
+
+								<div class="field-row">
+									<div class="field">
+										<label for="su-password">Password</label>
+										<input id="su-password" name="password" type="password"
+											placeholder="At least 6 characters" required />
+									</div>
+									<div class="field">
+										<label for="su-confirmPassword">Confirm password</label>
+										<input id="su-confirmPassword" name="confirmPassword"
+											type="password" placeholder="Repeat password" required />
+									</div>
+								</div>
+
+								<div class="field">
+									<label class="checkbox-row">
+										<input type="checkbox" id="su-agree" name="agree" />
+										<span>
+											I agree to Pizza House’s terms and understand this is a
+											demo/student project
+											(no real payments or deliveries).
+										</span>
+									</label>
+								</div>
+
+								<p class="error-msg" id="signupError">
+									Please fill in all required fields, use a 6+ character
+									password, and confirm it correctly.
+								</p>
+
+								<!--/* <button type="submit" class="btn-primary">Create
+									Account</button> */-->
+									<p class="error-msg" id="signupError"></p>
+									<button type="submit" class="btn-primary">Create Account</button>
+							</form>
+
+							<div class="auth-footer">
+								<span>Already have an account?
+									<span class="toggle-link action"
+										onclick="setMode('login')">Log
+										in</span>
+								</span>
+								<a href="MainPizzapage.html">← Back to home</a>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+			<!-- Frame 2: Login form left (40%), Image right (60%) -->
+			<section class="frame" aria-label="Login frame">
+				<div class="frame-inner">
+					<div class="form-col">
+						<div class="auth-card">
+							<div class="brand">
+								<div class="brand-logo">PH</div>
+								<div class="brand-text">
+									<span>Pizza House</span>
+									<span>Account Login</span>
+								</div>
+							</div>
+
+							<div class="auth-header">
+								<h1>Welcome back 👋</h1>
+								<p>Log in to reorder your favorites and track your orders
+									faster.</p>
+							</div>
+
+							<form method="post" id="loginForm">
+								<div class="field">
+									<label for="li-email">Email address</label>
+									<input id="li-email" name="email" type="email"
+										placeholder="you@example.com" required />
+								</div>
+
+								<div class="field">
+									<label for="li-password">Password</label>
+									<input id="li-password" name="password" type="password"
+										placeholder="••••••••" required />
+								</div>
+
+								<div class="field-inline">
+									<label class="checkbox-row">
+										<input type="checkbox" name="remember" />
+										<span>Keep me signed in</span>
+									</label>
+									<a href="#" style="font-size:12px;">Forgot password?</a>
+								</div>
+
+								<p class="error-msg" id="loginError">
+									Please enter both email and password.
+								</p>
+
+								<p class="error-msg" id="loginError"></p>
+    						<button type="submit" class="btn-primary">Log In</button>
+							</form>
+
+							<div class="auth-footer">
+								<span>New here?
+									<span class="toggle-link action"
+										onclick="setMode('signup')">Create
+										an account</span>
+								</span>
+								<a href="order.html">← Back to home</a>
+							</div>
+						</div>
+					</div>
+
+					<div class="image-col">
+						<div class="image-bg"></div>
+						<div class="image-visual">
+							<!-- <div class="pizza-hero"></div> -->
+						</div>
+						<div class="image-caption"
+							style="right:40px; left:auto; text-align:right;">
+							<span>Hot & Ready</span>
+							Log in, hit reorder, and let us handle the rest.
+						</div>
+					</div>
+				</div>
+			</section>
+		</div>
+	</div>
+
+	<script>
+    // ---------- Helpers for layout mode (same idea as before) ----------
+    function setMode(mode) {
+        const shell = document.getElementById('shell');
+        shell.setAttribute('data-mode', mode);
+        if (mode === 'login') {
+            history.replaceState(null, "", "#login");
+        } else {
+            history.replaceState(null, "", "#signup");
+        }
+    }
+
+    // ---------- Local Storage helpers ----------
+    const USERS_KEY = 'pizza_users';
+    const CURRENT_USER_KEY = 'pizza_current_user';
+
+    function loadUsers() {
+        try {
+            const raw = localStorage.getItem(USERS_KEY);
+            if (!raw) return [];
+            const parsed = JSON.parse(raw);
+            return Array.isArray(parsed) ? parsed : [];
+        } catch (e) {
+            console.error('Error reading users from localStorage', e);
+            return [];
+        }
+    }
+
+    function saveUsers(users) {
+        localStorage.setItem(USERS_KEY, JSON.stringify(users));
+    }
+
+    function setCurrentUser(user) {
+        localStorage.setItem(CURRENT_USER_KEY, JSON.stringify(user));
+    }
+
+    // ---------- Signup handling ----------
+    function handleSignupSubmit(event) {
+        event.preventDefault();
+
+        const first = document.getElementById('su-firstName');
+        const last = document.getElementById('su-lastName');
+        const emailInput = document.getElementById('su-email');
+        const phone = document.getElementById('su-phone');
+        const password = document.getElementById('su-password');
+        const confirm = document.getElementById('su-confirmPassword');
+        const agree = document.getElementById('su-agree');
+        const error = document.getElementById('signupError');
+
+        const firstName = first.value.trim();
+        const lastName = last.value.trim();
+        const email = emailInput.value.trim().toLowerCase();
+        const phoneVal = phone.value.trim();
+        const pass = password.value;
+        const pass2 = confirm.value;
+				const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,15}$/;
+
+        // reset error
+        error.style.display = 'none';
+        error.textContent = '';
+
+        // basic validation
+        if (!firstName || !lastName || !email) {
+            error.textContent = 'Please fill in your name and email.';
+            error.style.display = 'block';
+            return;
+        }
+
+        if (!passwordRegex.test(pass)) {
+            error.textContent = 'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character (e.g., !@#$%^&*).';
+            error.style.display = 'block';
+            return;
+        }
+
+        if (pass !== pass2) {
+            error.textContent = 'Passwords do not match.';
+            error.style.display = 'block';
+            return;
+        }
+
+        if (!agree.checked) {
+            error.textContent = 'Please accept the terms before creating an account.';
+            error.style.display = 'block';
+            return;
+        }
+
+        // create account object to send to server
+        const account = {
+            firstName,
+            lastName,
+            email,
+            phone: phoneVal,
+            password: pass
+        };
+
+        error.textContent = 'Sending account data...';
+        error.style.display = 'block';
+        error.style.color = '#ffe082';
+
+        // Send to server as JSON
+        fetch('/order', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(account)
+        }).then(resp => resp.text()).then(text => {
+            error.textContent = 'Account registered! ' + text;
+            error.style.color = '#4caf50';
+            error.style.display = 'block';
+
+            // Clear form
+            first.value = '';
+            last.value = '';
+            emailInput.value = '';
+            phone.value = '';
+            password.value = '';
+            confirm.value = '';
+            agree.checked = false;
+
+            // Switch to login view & prefill email
+            setMode('login');
+            const loginEmail = document.getElementById('li-email');
+            if (loginEmail) loginEmail.value = email;
+        }).catch(err => {
+            error.textContent = 'Failed to register: ' + err;
+            error.style.color = '#ff5252';
+            error.style.display = 'block';
+        });
+    }
+
+    // ---------- Login handling ----------
+    function handleLoginSubmit(event) {
+        event.preventDefault();
+
+        const emailInput = document.getElementById('li-email');
+        const passwordInput = document.getElementById('li-password');
+        const error = document.getElementById('loginError');
+
+        const email = emailInput.value.trim().toLowerCase();
+        const pass = passwordInput.value;
+
+        error.style.display = 'none';
+        error.style.color = '#ff5252';
+        error.textContent = '';
+
+        if (!email || !pass) {
+            error.textContent = 'Please enter both email and password.';
+            error.style.display = 'block';
+            return;
+        }
+
+        // Create login object to send to server
+        const login = {
+            email,
+            password: pass
+        };
+
+        error.textContent = 'Logging in...';
+        error.style.color = '#ffe082';
+        error.style.display = 'block';
+
+        fetch('/order', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(login)
+        }).then(resp => resp.text()).then(text => {
+            error.textContent = 'Login successful! ' + text;
+            error.style.color = '#4caf50';
+            error.style.display = 'block';
+
+            // Store current user locally
+            setCurrentUser({email});
+
+            // Redirect to home after a short delay
+            setTimeout(() => {
+                window.location.href = 'order.html';
+            }, 1500);
+        }).catch(err => {
+            error.textContent = 'Login failed: ' + err;
+            error.style.color = '#ff5252';
+            error.style.display = 'block';
+        });
+    }
+
+    // ---------- Init: attach handlers & hash-based mode ----------
+    document.addEventListener('DOMContentLoaded', function () {
+        const signupForm = document.getElementById('signupForm');
+        const loginForm = document.getElementById('loginForm');
+
+        if (signupForm) {
+            signupForm.addEventListener('submit', handleSignupSubmit);
+        }
+        if (loginForm) {
+            loginForm.addEventListener('submit', handleLoginSubmit);
+        }
+
+        // Support direct links: auth.html#login or #signup
+        const hash = window.location.hash.toLowerCase();
+        if (hash === '#login') {
+            setMode('login');
+        } else {
+            setMode('signup');
+        }
+    });
+</script>
+
+</body>
+
+</html>
