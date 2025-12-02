@@ -1,0 +1,23 @@
+------------------------------
+Order ID: ORD20251201163031745
+Customer Name: Zachariah Matthew Houck
+Address: 1015 8th Avenue South, St. Cloud, MN 56301
+Date: 2025-12-01
+Time: 16:30:31
+Total: $9.50
+Pizzas:
+  Pizza 1: Size $8, Toppings: Extra Cheese ($1)
+------------------------------
+
+------------------------------
+Order ID: ORD20251201171632825
+Customer Name: Zachariah Matthew Houck
+Address: 1015 8th Avenue South, St. Cloud, MN 56301
+Date: 2025-12-01
+Time: 17:16:32
+Total: $20.50
+Pizzas:
+  Pizza 1: Size $10, Toppings: Onions ($1), Olives ($1)
+  Pizza 2: Size $6, Toppings: Extra Cheese ($1)
+------------------------------
+

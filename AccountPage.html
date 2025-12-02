@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Account & Orders</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background-color: #fdf2e9;
+    }
+    /* Tabs container */
+    .tabs {
+      display: flex;
+      background-color: #d35400;
+      padding: 0;
+      margin: 0;
+    }
+    .tabs button {
+      flex: 1;
+      text-align: center;
+      padding: 14px;
+      border: none;
+      background-color: #d35400;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .tabs button:hover {
+      background-color: #a84300;
+    }
+    .tabs button.active {
+      background-color: #fdf2e9;
+      color: #d35400;
+      border-bottom: 3px solid #d35400;
+    }
+    /* Main content */
+    .content {
+      padding: 20px;
+    }
+    form, table {
+      max-width: 600px;
+      margin: 20px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 12px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    button.save {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #27ae60;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button.save:hover {
+      background-color: #219150;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+    }
+    th {
+      background-color: #f39c12;
+      color: white;
+    }
+    tr:nth-child(even) {
+      background-color: #fdf2e9;
+    }
+  </style>
+</head>
+<body>
+  <div style="text-align: right; padding: 10px; background: rgba(0,0,0,0.1);">
+    <span id="userInfo" style="margin-right: 15px;">👤 <span id="userName"></span></span>
+    <button type="button" id="logoutBtn" style="background-color: #c0392b; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold;" onclick="logout()">Logout</button>
+    <button type="button" style="background-color: #d35400; color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; margin-left: 10px;" onclick="window.location.href='MainPizzapage.html'">Home</button>
+  </div>
+  <!-- Folder Tabs -->
+  <div class="tabs">
+    <button id="accountTab" class="active">Account Info</button>
+    <button id="historyTab">Order History</button>
+  </div>
+
+  <!-- Account Info Section -->
+  <div id="accountSection" class="content">
+    <h1>Account Information</h1>
+    <form id="accountForm">
+      <label for="firstName">First Name:</label>
+      <input type="text" id="firstName" name="firstName">
+
+      <label for="lastName">Last Name:</label>
+      <input type="text" id="lastName" name="lastName">
+
+      <label for="address">Street Address:</label>
+      <input type="text" id="address" name="address">
+
+      <label for="city">City:</label>
+      <input type="text" id="city" name="city">
+
+      <label for="state">State:</label>
+      <input type="text" id="state" name="state">
+
+      <label for="zip">Zip Code:</label>
+      <input type="number" id="zip" name="zip">
+
+      <label for="cardNumber">Card Number:</label>
+      <input type="text" id="cardNumber" name="cardNumber"
+             inputmode="numeric" pattern="[0-9]{13,16}" maxlength="16" required>
+
+      <label for="expiry">Card Expiration Date (MM/YY):</label>
+      <input type="text" id="expiry" name="expiry"
+             inputmode="numeric" pattern="[0-9]{2}/[0-9]{2}" placeholder="MM/YY" required>
+
+      <label for="cvv">CVV:</label>
+      <input type="text" id="cvv" name="cvv"
+             inputmode="numeric" pattern="[0-9]{3,4}" maxlength="4" required>
+
+      <button type="submit" class="save">Save Information</button>
+    </form>
+  </div>
+
+  <!-- Order History Section -->
+  <div id="historySection" class="content" style="display:none;">
+    <h1>Order History</h1>
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Customer</th>
+          <th>Address</th>
+          <th>Pizzas</th>
+          <th>Total</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody id="orderTable"></tbody>
+    </table>
+  </div>
+
+  <script>
+    // Session check - redirect to login if not logged in
+    const CURRENT_USER_KEY = 'pizza_current_user';
+
+    function getCurrentUser() {
+      try {
+        const raw = localStorage.getItem(CURRENT_USER_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    // Check login status on page load
+    (function() {
+      const user = getCurrentUser();
+      if (!user || !user.email) {
+        window.location.href = 'auth.html#login';
+        return;
+      }
+      // Display user info
+      document.getElementById('userName').textContent = user.email;
+    })();
+
+    function logout() {
+      localStorage.removeItem(CURRENT_USER_KEY);
+      window.location.href = 'MainPizzapage.html';
+    }
+
+    // Tab switching
+    const accountTab = document.getElementById("accountTab");
+    const historyTab = document.getElementById("historyTab");
+    const accountSection = document.getElementById("accountSection");
+    const historySection = document.getElementById("historySection");
+
+    accountTab.addEventListener("click", () => {
+      accountTab.classList.add("active");
+      historyTab.classList.remove("active");
+      accountSection.style.display = "block";
+      historySection.style.display = "none";
+    });
+
+    historyTab.addEventListener("click", () => {
+      historyTab.classList.add("active");
+      accountTab.classList.remove("active");
+      accountSection.style.display = "none";
+      historySection.style.display = "block";
+      loadOrders();
+    });
+
+    // Save account info
+    document.getElementById("accountForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const accountData = {
+        firstName: document.getElementById("firstName").value,
+        lastName: document.getElementById("lastName").value,
+        address: document.getElementById("address").value,
+        city: document.getElementById("city").value,
+        state: document.getElementById("state").value,
+        zip: document.getElementById("zip").value,
+        cardNumber: document.getElementById("cardNumber").value,
+        expiry: document.getElementById("expiry").value,
+        cvv: document.getElementById("cvv").value
+      };
+      localStorage.setItem("accountInfo", JSON.stringify(accountData));
+      alert("Account information saved!");
+    });
+
+    function loadOrders() {
+      const user = getCurrentUser();
+      if (!user || !user.email) {
+        document.getElementById("orderTable").innerHTML = "<tr><td colspan='6'>Please log in to view orders.</td></tr>";
+        return;
+      }
+
+      // Fetch order history from server
+      fetch(`/orderhistory?email=${encodeURIComponent(user.email)}`)
+        .then(resp => resp.text())
+        .then(text => {
+          console.log('Raw response:', text);
+          console.log('Response length:', text.length);
+          
+          const tableBody = document.getElementById("orderTable");
+          tableBody.innerHTML = "";
+          
+          if (!text || text.trim() === "") {
+            tableBody.innerHTML = "<tr><td colspan='6'>No orders found.</td></tr>";
+            return;
+          }
+
+          // Parse the text file format
+          const orders = [];
+          const blocks = text.split('------------------------------');
+          console.log('Number of blocks:', blocks.length);
+          
+          blocks.forEach((block, blockIndex) => {
+            console.log(`Block ${blockIndex}:`, block);
+            
+            if (!block.trim()) return;
+            
+            const lines = block.trim().split('\n');
+            const order = {};
+            let collectingPizzas = false;
+            
+            lines.forEach((line, index) => {
+              line = line.trim();
+              
+              if (line.startsWith('Order ID:')) {
+                order.id = line.substring('Order ID:'.length).trim();
+              } else if (line.startsWith('Customer Name:')) {
+                order.customer = line.substring('Customer Name:'.length).trim();
+              } else if (line.startsWith('Address:')) {
+                order.address = line.substring('Address:'.length).trim();
+              } else if (line.startsWith('Date:')) {
+                order.date = line.substring('Date:'.length).trim();
+              } else if (line.startsWith('Time:')) {
+                order.time = line.substring('Time:'.length).trim();
+              } else if (line.startsWith('Total:')) {
+                order.total = line.substring('Total:'.length).trim();
+              } else if (line.startsWith('Pizzas:')) {
+                order.pizzas = [];
+                collectingPizzas = true;
+              } else if (collectingPizzas && line.startsWith('Pizza')) {
+                order.pizzas.push(line);
+              }
+            });
+            
+            console.log('Parsed order:', order);
+            
+            if (order.id) {
+              orders.push(order);
+            }
+          });
+
+          console.log('Total orders parsed:', orders.length);
+
+          if (orders.length === 0) {
+            tableBody.innerHTML = "<tr><td colspan='6'>No orders found.</td></tr>";
+          } else {
+            orders.forEach(order => {
+              const pizzaDetails = order.pizzas && order.pizzas.length > 0 
+                ? order.pizzas.join('<br>') 
+                : 'N/A';
+              const row = document.createElement("tr");
+              row.innerHTML = `
+                <td>${order.id || 'N/A'}</td>
+                <td>${order.customer || 'N/A'}</td>
+                <td>${order.address || 'N/A'}</td>
+                <td>${pizzaDetails}</td>
+                <td>${order.total || 'N/A'}</td>
+                <td>${order.date || 'N/A'} ${order.time || ''}</td>
+              `;
+              tableBody.appendChild(row);
+            });
+          }
+        })
+        .catch(err => {
+          console.error('Error loading orders:', err);
+          document.getElementById("orderTable").innerHTML = "<tr><td colspan='6'>Error loading orders.</td></tr>";
+        });
+    }
+
+    
+  </script>
+</body>
+</html>
+
+
+
+

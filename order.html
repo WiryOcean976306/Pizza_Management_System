@@ -5,10 +5,12 @@
   <title>Order Menu</title>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #fdf2e9;
-      margin: 0;
-      padding: 20px;
+        font-family: Arial, sans-serif;
+        background: url(https://copilot.microsoft.com/th/id/BCO.170fa1b2-d31b-47ad-bcce-5bfb08898f4d.png) no-repeat center center fixed;
+        background-size: cover;
+        background-color: #fdf2e9; /* fallback color */
+        margin: 0;
+        padding: 20px;
     }
     h1 {
       color: #d35400;
@@ -82,8 +84,12 @@
   </style>
 </head>
 <body>
+  <div style="text-align: right; padding: 10px; background: rgba(0,0,0,0.1);">
+    <span id="userInfo" style="display: none; margin-right: 15px;">👤 <span id="userName"></span></span>
+    <button type="button" id="logoutBtn" style="display: none; background-color: #c0392b; color: white; border: none; padding: 5px 15px; border-radius: 4px; cursor: pointer;" onclick="logout()">Logout</button>
+  </div>
   <h1>Order Your Pizza</h1>
-  <form id="pizzaForm" action="submit_order.html" method="post">
+  <form id="pizzaForm" method="post">
     <!-- Customer Info -->
     <label for="name">Your Name:</label>
     <input type="text" id="name" name="customerName" required>
@@ -157,13 +163,16 @@
     </fieldset>
 
     <div id="total">Total: $0</div>
-    <button type="submit">Checkout</button>
+    <button type="submit" id="checkoutBtn">Checkout</button>
+    <div id="result"></div>
   </form>
 
   <script>
     const pizzaContainer = document.getElementById("pizzaContainer");
     const addPizzaBtn = document.getElementById("addPizzaBtn");
     const totalDiv = document.getElementById("total");
+    const resultDiv = document.getElementById("result");
+    const pizzaForm = document.getElementById("pizzaForm");
 
     function calculatePizzaSubtotal(pizza) {
       let subtotal = 0;
@@ -225,6 +234,98 @@
     });
 
     calculateTotal();
+
+    // Handle form submission - send JSON to server
+    pizzaForm.addEventListener("submit", (ev) => {
+      ev.preventDefault();
+
+      const customerName = document.getElementById("name").value;
+      const street = document.getElementById("street").value;
+      const city = document.getElementById("city").value;
+      const state = document.getElementById("state").value;
+      const zipcode = document.getElementById("zipcode").value;
+      const cardName = document.getElementById("cardName").value;
+      const cardNumber = document.getElementById("cardNumber").value;
+      const expiry = document.getElementById("expiry").value;
+      const cvv = document.getElementById("cvv").value;
+
+      const pizzas = [];
+      document.querySelectorAll(".pizza").forEach(pizza => {
+        const size = pizza.querySelector(".size").value;
+        const toppings = Array.from(pizza.querySelectorAll(".topping:checked")).map(t => t.parentNode.textContent.trim());
+        pizzas.push({ size, toppings });
+      });
+
+      // Get logged-in user email
+      const user = getCurrentUser();
+      const userEmail = user && user.email ? user.email : "";
+
+      const order = {
+        customerName,
+        email: userEmail,
+        address: { street, city, state, zipcode },
+        pizzas,
+        payment: { cardName, cardNumber, expiry, cvv }
+      };
+
+      resultDiv.textContent = "Sending order...";
+      resultDiv.style.display = "block";
+      resultDiv.style.marginTop = "15px";
+      resultDiv.style.padding = "10px";
+      resultDiv.style.backgroundColor = "#ffe082";
+      resultDiv.style.borderRadius = "4px";
+
+      fetch("/order", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(order)
+      }).then(resp => resp.text()).then(text => {
+        resultDiv.textContent = "✓ Order received!";
+        resultDiv.style.backgroundColor = "#4caf50";
+        resultDiv.style.color = "white";
+
+        // Redirect to order history page after 1.5 seconds
+        setTimeout(() => {
+          window.location.href = "AccountPage.html";
+        }, 1500);
+      }).catch(err => {
+        resultDiv.textContent = "✗ Failed to send order: " + err;
+        resultDiv.style.backgroundColor = "#ff5252";
+        resultDiv.style.color = "white";
+      });
+    });
+
+    // User session management
+    const CURRENT_USER_KEY = 'pizza_current_user';
+
+    function getCurrentUser() {
+      try {
+        const raw = localStorage.getItem(CURRENT_USER_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem(CURRENT_USER_KEY);
+      window.location.href = 'MainPizzapage.html';
+    }
+
+    // On page load, check if user is logged in and prefill name
+    document.addEventListener('DOMContentLoaded', function() {
+      const user = getCurrentUser();
+      if (user && user.email) {
+        document.getElementById('userName').textContent = user.email;
+        document.getElementById('userInfo').style.display = 'inline';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+
+        // Prefill customer name from stored user data if available
+        if (user.firstName && user.lastName) {
+          document.getElementById('name').value = user.firstName + ' ' + user.lastName;
+        }
+      }
+    });
   </script>
 </body>
 </html>

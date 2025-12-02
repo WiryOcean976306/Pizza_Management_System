@@ -89,14 +89,18 @@
     <nav>
       <ul>
         <li><a href="order.html">Order</a></li>
+        <li><a href="#" onclick="checkLoginAndRedirect(event, 'AccountPage.html')">History</a></li>
         <li><a href="contact.html">Contact</a></li>
       </ul>
     </nav>
+
     <!-- Title row -->
     <div class="header-bottom">
       <h1>Pizza House</h1>
       <div>
-        <button class="signup-btn" onclick="window.location.href='auth.html'">Sign Up</button>
+        <span id="userInfo" style="margin-right: 15px; display: none;">👤 <span id="userName"></span></span>
+        <button class="signup-btn" id="authBtn" onclick="window.location.href='auth.html'">Sign Up</button>
+        <button class="signup-btn" id="logoutBtn" style="display: none; background-color: #c0392b;" onclick="logout()">Logout</button>
         <!-- Shopping cart removed -->
       </div>
     </div>
@@ -107,7 +111,47 @@
   </main>
 
   <footer>
-    <p>&copy; 2025 Pizza House. All rights reserved.</p>
+    <p>&copy; 2023 Pizza House. All rights reserved.</p>
   </footer>
+
+  <script>
+    const CURRENT_USER_KEY = 'pizza_current_user';
+
+    function getCurrentUser() {
+      try {
+        const raw = localStorage.getItem(CURRENT_USER_KEY);
+        return raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function logout() {
+      localStorage.removeItem(CURRENT_USER_KEY);
+      window.location.reload();
+    }
+
+    function checkLoginAndRedirect(event, targetPage) {
+      event.preventDefault();
+      const user = getCurrentUser();
+      if (user && user.email) {
+        window.location.href = targetPage;
+      } else {
+        window.location.href = 'auth.html#login';
+      }
+    }
+
+    // On page load, check if user is logged in
+    document.addEventListener('DOMContentLoaded', function() {
+      const user = getCurrentUser();
+      if (user && user.email) {
+        document.getElementById('userName').textContent = user.email;
+        document.getElementById('userInfo').style.display = 'inline';
+        document.getElementById('authBtn').textContent = 'My Account';
+        document.getElementById('authBtn').onclick = () => window.location.href = 'auth.html#login';
+        document.getElementById('logoutBtn').style.display = 'inline-block';
+      }
+    });
+  </script>
 </body>
 </html>
