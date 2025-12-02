@@ -179,6 +179,8 @@
       }
       // Display user info
       document.getElementById('userName').textContent = user.email;
+      document.getElementById('firstName').value = user.firstName;
+      document.getElementById('lastName').value = user.lastName;
     })();
 
     function logout() {
@@ -238,10 +240,10 @@
         .then(text => {
           console.log('Raw response:', text);
           console.log('Response length:', text.length);
-          
+
           const tableBody = document.getElementById("orderTable");
           tableBody.innerHTML = "";
-          
+
           if (!text || text.trim() === "") {
             tableBody.innerHTML = "<tr><td colspan='6'>No orders found.</td></tr>";
             return;
@@ -251,19 +253,19 @@
           const orders = [];
           const blocks = text.split('------------------------------');
           console.log('Number of blocks:', blocks.length);
-          
+
           blocks.forEach((block, blockIndex) => {
             console.log(`Block ${blockIndex}:`, block);
-            
+
             if (!block.trim()) return;
-            
+
             const lines = block.trim().split('\n');
             const order = {};
             let collectingPizzas = false;
-            
+
             lines.forEach((line, index) => {
               line = line.trim();
-              
+
               if (line.startsWith('Order ID:')) {
                 order.id = line.substring('Order ID:'.length).trim();
               } else if (line.startsWith('Customer Name:')) {
@@ -283,9 +285,9 @@
                 order.pizzas.push(line);
               }
             });
-            
+
             console.log('Parsed order:', order);
-            
+
             if (order.id) {
               orders.push(order);
             }
@@ -297,8 +299,8 @@
             tableBody.innerHTML = "<tr><td colspan='6'>No orders found.</td></tr>";
           } else {
             orders.forEach(order => {
-              const pizzaDetails = order.pizzas && order.pizzas.length > 0 
-                ? order.pizzas.join('<br>') 
+              const pizzaDetails = order.pizzas && order.pizzas.length > 0
+                ? order.pizzas.join('<br>')
                 : 'N/A';
               const row = document.createElement("tr");
               row.innerHTML = `
@@ -319,7 +321,7 @@
         });
     }
 
-    
+
   </script>
 </body>
 </html>
