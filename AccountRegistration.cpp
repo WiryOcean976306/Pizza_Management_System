@@ -32,13 +32,12 @@ string now_timestamp() {
 
 void processAccount(const string& json_str) {
     // Extract account info using PrettyParse
-    string firstName, lastName, email, password, phone;
+    string firstName, lastName, email, password;
     try {
         firstName = PrettyParse(json_str, "firstName");
         lastName = PrettyParse(json_str, "lastName");
         email = PrettyParse(json_str, "email");
         password = PrettyParse(json_str, "password");
-        phone = PrettyParse(json_str, "phone");
     } catch (...) {
         // If parsing fails, continue with empty strings
         cerr << "Error parsing JSON for account registration" << endl;
@@ -52,9 +51,6 @@ void processAccount(const string& json_str) {
         ofs_accounts << "Last Name: " << lastName << "\n";
         ofs_accounts << "Email: " << email << "\n";
         ofs_accounts << "Password: " << password << "\n";
-        if (!phone.empty()) {
-            ofs_accounts << "Phone: " << phone << "\n";
-        }
         ofs_accounts << "Date: " << now_timestamp() << "\n";
         ofs_accounts << "------------------------------\n\n";
         ofs_accounts.close();

@@ -430,11 +430,13 @@
 										placeholder="you@example.com" required />
 								</div>
 
+								<!--/*
 								<div class="field">
 									<label for="su-phone">Phone (for delivery updates)</label>
 									<input id="su-phone" name="phone" type="tel"
 										placeholder="(555) 123-4567" />
 								</div>
+								*/-->
 
 								<div class="field-row">
 									<div class="field">
@@ -599,7 +601,6 @@
         const first = document.getElementById('su-firstName');
         const last = document.getElementById('su-lastName');
         const emailInput = document.getElementById('su-email');
-        const phone = document.getElementById('su-phone');
         const password = document.getElementById('su-password');
         const confirm = document.getElementById('su-confirmPassword');
         const agree = document.getElementById('su-agree');
@@ -608,7 +609,6 @@
         const firstName = first.value.trim();
         const lastName = last.value.trim();
         const email = emailInput.value.trim().toLowerCase();
-        const phoneVal = phone.value.trim();
         const pass = password.value;
         const pass2 = confirm.value;
 				const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,15}$/;
@@ -647,7 +647,6 @@
             firstName,
             lastName,
             email,
-            phone: phoneVal,
             password: pass
         };
 
@@ -676,7 +675,6 @@
             first.value = '';
             last.value = '';
             emailInput.value = '';
-            phone.value = '';
             password.value = '';
             confirm.value = '';
             agree.checked = false;
