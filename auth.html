@@ -11,9 +11,9 @@
 			--primary-dark: #a84300;
 			--bg: #0b0b10;
 			--card-bg: #181820;
-			--text: #f5f5f5;
-			--muted: #b3b3b3;
-			--accent: #ffe082;
+			--text: #000000ff;
+			--muted: #000000ff;
+			--accent: #d35400;
 			--error: #ff5252;
 		}
 
@@ -165,7 +165,7 @@
 		.auth-card {
 			width: 100%;
 			max-width: 430px;
-			background: rgba(24, 24, 32, 0.96);
+			background: rgba(246, 246, 246, 0.96);
 			border-radius: 18px;
 			padding: 22px 22px 18px;
 			box-shadow: 0 16px 36px rgba(0, 0, 0, .8);
@@ -256,8 +256,8 @@
 		input[type="tel"] {
 			padding: 9px 11px;
 			border-radius: 10px;
-			border: 1px solid rgba(255, 255, 255, 0.16);
-			background: #101018;
+			border: 1px solid rgba(0, 0, 0, 0.16);
+			background: #c2c2c2;
 			color: var(--text);
 			font-size: 14px;
 		}
@@ -308,7 +308,7 @@
 			font-weight: 600;
 			cursor: pointer;
 			margin-top: 4px;
-			box-shadow: 0 10px 26px rgba(0, 0, 0, .7);
+			box-shadow: 0 15px 55px rgba(0, 0, 0, .3);
 			transition: background 0.15s ease-out, transform 0.1s ease-out, box-shadow 0.1s ease-out;
 			width: 100%;
 		}
@@ -430,19 +430,17 @@
 										placeholder="you@example.com" required />
 								</div>
 
-								<!--/*
-								<div class="field">
+								<!--/* <div class="field">
 									<label for="su-phone">Phone (for delivery updates)</label>
 									<input id="su-phone" name="phone" type="tel"
 										placeholder="(555) 123-4567" />
-								</div>
-								*/-->
+								</div> */-->
 
 								<div class="field-row">
 									<div class="field">
 										<label for="su-password">Password</label>
 										<input id="su-password" name="password" type="password"
-											placeholder="At least 6 characters" required />
+											placeholder="Type your password" required />
 									</div>
 									<div class="field">
 										<label for="su-confirmPassword">Confirm password</label>
@@ -469,7 +467,8 @@
 
 								<!--/* <button type="submit" class="btn-primary">Create
 									Account</button> */-->
-								<button type="submit" class="btn-primary">Create Account</button>
+									<p class="error-msg" id="signupError"></p>
+									<button type="submit" class="btn-primary">Create Account</button>
 							</form>
 
 							<div class="auth-footer">
@@ -528,6 +527,8 @@
 								<p class="error-msg" id="loginError">
 									Please enter both email and password.
 								</p>
+
+								<p class="error-msg" id="loginError"></p>
     						<button type="submit" class="btn-primary">Log In</button>
 							</form>
 
@@ -537,7 +538,7 @@
 										onclick="setMode('signup')">Create
 										an account</span>
 								</span>
-								<a href="order.html">← Back to home</a>
+								<a href="MainPizzapage.html">← Back to home</a>
 							</div>
 						</div>
 					</div>
@@ -595,7 +596,7 @@
     }
 
     // ---------- Signup handling ----------
-    function handleSignupSubmit(event) {
+    async function handleSignupSubmit(event) {
         event.preventDefault();
 
         const first = document.getElementById('su-firstName');
@@ -608,7 +609,7 @@
 
         const firstName = first.value.trim();
         const lastName = last.value.trim();
-        const email = emailInput.value.trim().toLowerCase();
+        const email = emailInput.value.trim();
         const pass = password.value;
         const pass2 = confirm.value;
 				const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,15}$/;
@@ -642,123 +643,110 @@
             return;
         }
 
-        // create account object to send to server
-        const account = {
-            firstName,
-            lastName,
-            email,
-            password: pass
-        };
-
-        error.textContent = 'Sending account data...';
-        error.style.display = 'block';
-        error.style.color = '#ffe082';
-
-		// Send to server as JSON
-		fetch('/account', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(account)
-        }).then(resp => resp.text()).then(text => {
-            error.textContent = 'Account registered! ' + text;
-            error.style.color = '#4caf50';
-            error.style.display = 'block';
-
-            // Store user details in localStorage
-            setCurrentUser({ 
-                email, 
-                firstName, 
-                lastName 
+        try {
+            // Send account creation request to server
+            const response = await fetch('/account', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    password: pass,
+                    phone: '0000000000' // Default phone if not collected
+                })
             });
 
-            // Clear form
-            first.value = '';
-            last.value = '';
-            emailInput.value = '';
-            password.value = '';
-            confirm.value = '';
-            agree.checked = false;
+            if (response.ok) {
+                // Account created successfully
+                // Clear form
+                first.value = '';
+                last.value = '';
+                emailInput.value = '';
+                password.value = '';
+                confirm.value = '';
+                agree.checked = false;
 
-            // Switch to login view & prefill email
-            setMode('login');
-            const loginEmail = document.getElementById('li-email');
-            if (loginEmail) loginEmail.value = email;
-        }).catch(err => {
-            error.textContent = 'Failed to register: ' + err;
-            error.style.color = '#ff5252';
+                // Switch to login view & prefill email
+                setMode('login');
+                const loginEmail = document.getElementById('li-email');
+                if (loginEmail) loginEmail.value = email;
+
+                // Show a quick info message on the login side
+                const loginError = document.getElementById('loginError');
+                if (loginError) {
+                    loginError.style.display = 'block';
+                    loginError.style.color = '#4caf50';
+                    loginError.textContent = 'Account created! Please log in.';
+                }
+            } else {
+                error.textContent = 'Failed to create account. Email may already exist.';
+                error.style.display = 'block';
+            }
+        } catch (err) {
+            console.error('Signup error:', err);
+            error.textContent = 'Network error. Please try again.';
             error.style.display = 'block';
-        });
+        }
     }
 
     // ---------- Login handling ----------
-	function handleLoginSubmit(event) {
-		event.preventDefault();
+    async function handleLoginSubmit(event) {
+        event.preventDefault();
 
-		const emailInput = document.getElementById('li-email');
-		const passwordInput = document.getElementById('li-password');
-		const error = document.getElementById('loginError');
+        const emailInput = document.getElementById('li-email');
+        const passwordInput = document.getElementById('li-password');
+        const error = document.getElementById('loginError');
 
-		const email = emailInput.value.trim().toLowerCase();
-		const pass = passwordInput.value;
+        const email = emailInput.value.trim();
+        const pass = passwordInput.value;
 
-		error.style.display = 'none';
-		error.style.color = '#ff5252';
-		error.textContent = '';
+        error.style.display = 'none';
+        error.style.color = '#ff5252';
+        error.textContent = '';
 
-		if (!email || !pass) {
-			error.textContent = 'Please enter both email and password.';
-			error.style.display = 'block';
-			return;
-		}
+        if (!email || !pass) {
+            error.textContent = 'Please enter both email and password.';
+            error.style.display = 'block';
+            return;
+        }
 
-		const loginPayload = { email, password: pass };
+        try {
+            // Send login request to server
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: pass
+                })
+            });
 
-		const attemptLogin = (retriesLeft) => {
-			error.textContent = 'Logging in...';
-			error.style.color = '#ffe082';
-			error.style.display = 'block';
+            if (response.ok) {
+                // Login successful - store user info
+                const user = {
+                    email: email,
+                    firstName: email.split('@')[0] // Basic placeholder
+                };
+                setCurrentUser(user);
 
-			fetch('/login', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify(loginPayload)
-			}).then(async (resp) => {
-				const text = await resp.text();
-				if (!resp.ok) {
-					if (retriesLeft > 0) {
-						passwordInput.value = '';
-						passwordInput.focus();
-						setMode('login');
-						setTimeout(() => attemptLogin(retriesLeft - 1), 500);
-						return;
-					}
-					// Final failure: show error message and keep user on login form
-					error.textContent = 'Invalid email or password. Please try again.';
-					error.style.color = '#ff5252';
-					error.style.display = 'block';
-					passwordInput.value = '';
-					passwordInput.focus();
-					return;
-				}
-
-				error.textContent = text;
-				error.style.color = '#4caf50';
-				error.style.display = 'block';
-
-				// Store user session (email only for now; firstName/lastName would require backend to return them)
-				setCurrentUser({ email });
-				setTimeout(() => {
-					window.location.href = 'MainPizzapage.html';
-				}, 1000);
-			}).catch(() => {
-				error.textContent = 'Network error, please try again.';
-				error.style.color = '#ff5252';
-				error.style.display = 'block';
-			});
-		};
-
-		attemptLogin(1);
-	}
+                // Redirect to home
+                window.location.href = 'MainPizzapage.html';
+            } else {
+                // Login failed
+                error.textContent = 'Invalid email or password.';
+                error.style.display = 'block';
+            }
+        } catch (err) {
+            console.error('Login error:', err);
+            error.textContent = 'Network error. Please try again.';
+            error.style.display = 'block';
+        }
+    }
 
     // ---------- Init: attach handlers & hash-based mode ----------
     document.addEventListener('DOMContentLoaded', function () {
