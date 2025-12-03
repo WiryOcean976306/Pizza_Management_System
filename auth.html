@@ -440,7 +440,7 @@
 									<div class="field">
 										<label for="su-password">Password</label>
 										<input id="su-password" name="password" type="password"
-											placeholder="At least 6 characters" required />
+											placeholder="Type your password" required />
 									</div>
 									<div class="field">
 										<label for="su-confirmPassword">Confirm password</label>
@@ -596,7 +596,7 @@
     }
 
     // ---------- Signup handling ----------
-    function handleSignupSubmit(event) {
+    async function handleSignupSubmit(event) {
         event.preventDefault();
 
         const first = document.getElementById('su-firstName');
@@ -609,7 +609,7 @@
 
         const firstName = first.value.trim();
         const lastName = last.value.trim();
-        const email = emailInput.value.trim().toLowerCase();
+        const email = emailInput.value.trim();
         const pass = password.value;
         const pass2 = confirm.value;
 				const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,15}$/;
@@ -643,59 +643,64 @@
             return;
         }
 
-        // check if email already exists
-        const users = loadUsers();
-        const existing = users.find(u => u.email === email);
-        if (existing) {
-            error.textContent = 'An account with that email already exists. Try logging in instead.';
+        try {
+            // Send account creation request to server
+            const response = await fetch('/account', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    firstName: firstName,
+                    lastName: lastName,
+                    email: email,
+                    password: pass,
+                    phone: '0000000000' // Default phone if not collected
+                })
+            });
+
+            if (response.ok) {
+                // Account created successfully
+                // Clear form
+                first.value = '';
+                last.value = '';
+                emailInput.value = '';
+                password.value = '';
+                confirm.value = '';
+                agree.checked = false;
+
+                // Switch to login view & prefill email
+                setMode('login');
+                const loginEmail = document.getElementById('li-email');
+                if (loginEmail) loginEmail.value = email;
+
+                // Show a quick info message on the login side
+                const loginError = document.getElementById('loginError');
+                if (loginError) {
+                    loginError.style.display = 'block';
+                    loginError.style.color = '#4caf50';
+                    loginError.textContent = 'Account created! Please log in.';
+                }
+            } else {
+                error.textContent = 'Failed to create account. Email may already exist.';
+                error.style.display = 'block';
+            }
+        } catch (err) {
+            console.error('Signup error:', err);
+            error.textContent = 'Network error. Please try again.';
             error.style.display = 'block';
-            return;
-        }
-
-        // create user object (plain text password: fine for demo)
-        const newUser = {
-            id: Date.now(),
-            firstName,
-            lastName,
-            email,
-            password: pass
-        };
-
-        users.push(newUser);
-        saveUsers(users);
-
-        // Optional: clear form
-        first.value = '';
-        last.value = '';
-        emailInput.value = '';
-        phone.value = '';
-        password.value = '';
-        confirm.value = '';
-        agree.checked = false;
-
-        // Switch to login view & prefill email
-        setMode('login');
-        const loginEmail = document.getElementById('li-email');
-        if (loginEmail) loginEmail.value = email;
-
-        // Show a quick info message on the login side
-        const loginError = document.getElementById('loginError');
-        if (loginError) {
-            loginError.style.display = 'block';
-            loginError.style.color = '#4caf50';
-            loginError.textContent = 'Account created! Please log in.';
         }
     }
 
     // ---------- Login handling ----------
-    function handleLoginSubmit(event) {
+    async function handleLoginSubmit(event) {
         event.preventDefault();
 
         const emailInput = document.getElementById('li-email');
         const passwordInput = document.getElementById('li-password');
         const error = document.getElementById('loginError');
 
-        const email = emailInput.value.trim().toLowerCase();
+        const email = emailInput.value.trim();
         const pass = passwordInput.value;
 
         error.style.display = 'none';
@@ -708,20 +713,39 @@
             return;
         }
 
-        const users = loadUsers();
-        const user = users.find(u => u.email === email && u.password === pass);
+        try {
+            // Send login request to server
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: pass
+                })
+            });
 
-        if (!user) {
-            error.textContent = 'Invalid email or password.';
+            if (response.ok) {
+                // Login successful - store user info
+                const user = {
+                    email: email,
+                    firstName: email.split('@')[0] // Basic placeholder
+                };
+                setCurrentUser(user);
+
+                // Redirect to home
+                window.location.href = 'MainPizzapage.html';
+            } else {
+                // Login failed
+                error.textContent = 'Invalid email or password.';
+                error.style.display = 'block';
+            }
+        } catch (err) {
+            console.error('Login error:', err);
+            error.textContent = 'Network error. Please try again.';
             error.style.display = 'block';
-            return;
         }
-
-        // "Log in" the user on the frontend
-        setCurrentUser(user);
-
-        // Redirect to home (or a dashboard page)
-        window.location.href = 'MainPizzapage.html';
     }
 
     // ---------- Init: attach handlers & hash-based mode ----------
